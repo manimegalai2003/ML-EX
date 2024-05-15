@@ -1,57 +1,44 @@
-import streamlit as st
+# import necessary libarities
 import pandas as pd
+from sklearn import tree
+from sklearn.preprocessing import LabelEncoder
+from sklearn.naive_bayes import GaussianNB
 
-# Load data from CSV
-@st.cache
-def load_data():
-    data = pd.read_csv('tennisdata.csv')
-    return data
+# load data from CSV
+data = pd.read_csv('tennisdata.csv')
+print("THe first 5 values of data is :\n",data.head())
 
-data = load_data()
-
-st.title("Tennis Data Analysis")
-
-# Display the first 5 rows of the data
-st.write("The first 5 values of data are:")
-st.write(data.head())
-
-# Obtain Train data and Train output
+# obtain Train data and Train output
 X = data.iloc[:,:-1]
-st.write("\nThe First 5 values of train data are:")
-st.write(X.head())
+print("\nThe First 5 values of train data is\n",X.head())
 
 y = data.iloc[:,-1]
-st.write("\nThe first 5 values of Train output are:")
-st.write(y.head())
+print("\nThe first 5 values of Train output is\n",y.head())
 
-# Convert categorical features to numerical values
-outlook_mapping = {'Sunny': 0, 'Overcast': 1, 'Rainy': 2}
-X['Outlook'] = X['Outlook'].map(outlook_mapping)
+# Convert then in numbers 
+le_outlook = LabelEncoder()
+X.Outlook = le_outlook.fit_transform(X.Outlook)
 
-temperature_mapping = {'Hot': 0, 'Mild': 1, 'Cool': 2}
-X['Temperature'] = X['Temperature'].map(temperature_mapping)
+le_Temperature = LabelEncoder()
+X.Temperature = le_Temperature.fit_transform(X.Temperature)
 
-humidity_mapping = {'High': 0, 'Normal': 1}
-X['Humidity'] = X['Humidity'].map(humidity_mapping)
+le_Humidity = LabelEncoder()
+X.Humidity = le_Humidity.fit_transform(X.Humidity)
 
-windy_mapping = {'False': 0, 'True': 1}
-X['Windy'] = X['Windy'].map(windy_mapping)
+le_Windy = LabelEncoder()
+X.Windy = le_Windy.fit_transform(X.Windy)
 
-st.write("\nNow the Train data is:")
-st.write(X.head())
+print("\nNow the Train data is :\n",X.head())
 
-play_tennis_mapping = {'No': 0, 'Yes': 1}
-y = y.map(play_tennis_mapping)
-st.write("\nNow the Train output is:")
-st.write(y)
+le_PlayTennis = LabelEncoder()
+y = le_PlayTennis.fit_transform(y)
+print("\nNow the Train output is\n",y)
 
-# Split the data into training and testing sets
-train_size = int(0.8 * len(data))
-X_train, X_test = X[:train_size], X[train_size:]
-y_train, y_test = y[:train_size], y[train_size:]
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.20)
 
-st.write("\nTrain data shape:", X_train.shape)
-st.write("Test data shape:", X_test.shape)
+classifier = GaussianNB()
+classifier.fit(X_train,y_train)
 
-st.write("\nTrain output shape:", y_train.shape)
-st.write("Test output shape:", y_test.shape)
+from sklearn.metrics import accuracy_score
+print("Accuracy is:",accuracy_score(classifier.predict(X_test),y_test))
