@@ -1,9 +1,5 @@
 import streamlit as st
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
-from sklearn.naive_bayes import GaussianNB
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 
 # Load data from CSV
 @st.cache
@@ -29,33 +25,33 @@ st.write("\nThe first 5 values of Train output are:")
 st.write(y.head())
 
 # Convert categorical features to numerical values
-le_outlook = LabelEncoder()
-X['Outlook'] = le_outlook.fit_transform(X['Outlook'])
+outlook_mapping = {'Sunny': 0, 'Overcast': 1, 'Rainy': 2}
+X['Outlook'] = X['Outlook'].map(outlook_mapping)
 
-le_Temperature = LabelEncoder()
-X['Temperature'] = le_Temperature.fit_transform(X['Temperature'])
+temperature_mapping = {'Hot': 0, 'Mild': 1, 'Cool': 2}
+X['Temperature'] = X['Temperature'].map(temperature_mapping)
 
-le_Humidity = LabelEncoder()
-X['Humidity'] = le_Humidity.fit_transform(X['Humidity'])
+humidity_mapping = {'High': 0, 'Normal': 1}
+X['Humidity'] = X['Humidity'].map(humidity_mapping)
 
-le_Windy = LabelEncoder()
-X['Windy'] = le_Windy.fit_transform(X['Windy'])
+windy_mapping = {'False': 0, 'True': 1}
+X['Windy'] = X['Windy'].map(windy_mapping)
 
 st.write("\nNow the Train data is:")
 st.write(X.head())
 
-le_PlayTennis = LabelEncoder()
-y = le_PlayTennis.fit_transform(y)
+play_tennis_mapping = {'No': 0, 'Yes': 1}
+y = y.map(play_tennis_mapping)
 st.write("\nNow the Train output is:")
 st.write(y)
 
 # Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
+train_size = int(0.8 * len(data))
+X_train, X_test = X[:train_size], X[train_size:]
+y_train, y_test = y[:train_size], y[train_size:]
 
-# Train the classifier
-classifier = GaussianNB()
-classifier.fit(X_train, y_train)
+st.write("\nTrain data shape:", X_train.shape)
+st.write("Test data shape:", X_test.shape)
 
-# Evaluate the classifier
-accuracy = accuracy_score(classifier.predict(X_test), y_test)
-st.write("\nAccuracy is:", accuracy)
+st.write("\nTrain output shape:", y_train.shape)
+st.write("Test output shape:", y_test.shape)
